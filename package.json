@@ -1,0 +1,48 @@
+{
+  "name": "topological-sort-group",
+  "version": "0.0.0",
+  "description": "Topological sorting and cycle detection. Optional grouping for parallel processing",
+  "keywords": [
+    "topological",
+    "sort",
+    "cycle",
+    "detection",
+    "group"
+  ],
+  "homepage": "https://github.com/kmalakoff/topological-sort-group",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/kmalakoff/topological-sort-group.git"
+  },
+  "license": "MIT",
+  "author": "Kevin Malakoff <kmalakoff@gmail.com> (https://github.com/kmalakoff)",
+  "type": "module",
+  "exports": {
+    "import": "./dist/esm/index.mjs",
+    "require": "./dist/cjs/index.cjs",
+    "types": "./dist/types/index.d.ts"
+  },
+  "main": "dist/cjs/index.cjs",
+  "module": "dist/esm/index.mjs",
+  "types": "dist/types/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsds build",
+    "format": "biome check --write --unsafe src/ test/",
+    "test": "tsds test:node --no-timeouts",
+    "test:engines": "nvu engines npm test",
+    "version": "tsds version"
+  },
+  "devDependencies": {
+    "@types/mocha": "*",
+    "@types/node": "*"
+  },
+  "engines": {
+    "node": ">=0.8"
+  },
+  "tsds": {
+    "source": "src/index.ts"
+  }
+}
