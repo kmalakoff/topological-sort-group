@@ -2,6 +2,36 @@
 
 Topological sorting and cycle detection. Optional grouping for parallel processing.
 
+# sort by group - default
+```
+import assert from 'assert';
+import { Graph, sort, SortMode } from 'topological-sort-group';
+
+const graph = Graph.from(
+  [
+    /* nodes */
+    { package: { name: 'A' } },
+    { package: { name: 'B' } },
+    { package: { name: 'C' } },
+    { package: { name: 'D' } },
+    { package: { name: 'E' } },
+    { package: { name: 'F' } },
+    /* edges */
+    ['A', 'B'],
+    ['B', 'C'],
+    ['D', 'E'],
+    ['E', 'F'],
+    ['B', 'A'], // Creates a cycle
+  ],
+  { path: 'package.name' }
+);
+
+const result = sort(graph);
+assert.deepEqual(result.nodes, [[{ package: { name: 'D' } }], [{ package: { name: 'E' } }], [{ package: { name: 'F' } }]]);
+assert.deepEqual(result.cycles, [['A', 'B', 'A']]);
+```
+
+# sort flat
 ```
 import assert from 'assert';
 import { Graph, sort, SortMode } from 'topological-sort-group';
@@ -19,34 +49,6 @@ const graph = Graph.from([
 const result = sort(graph, SortMode.Flat);
 assert.deepEqual(result.nodes, ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']);
 assert.deepEqual(result.cycles, []);
-```
-
-```
-import assert from 'assert';
-import { Graph, sort, SortMode } from 'topological-sort-group';
-
-const graph = Graph.from(
-  [
-    /* nodes */
-    { name: 'A' },
-    { name: 'B' },
-    { name: 'C' },
-    { name: 'D' },
-    { name: 'E' },
-    { name: 'F' },
-    /* edges */
-    ['A', 'B'],
-    ['B', 'C'],
-    ['D', 'E'],
-    ['E', 'F'],
-    ['B', 'A'], // Creates a cycle
-  ],
-  { key: 'name' }
-);
-
-const result = sort(graph, SortMode.Group);
-assert.deepEqual(result.nodes, [[{ name: 'D' }], [{ name: 'E' }], [{ name: 'F' }]]);
-assert.deepEqual(result.cycles, [[{ name: 'A' }, { name: 'B' }, { name: 'A' }]]);
 ```
 
 ### Documentation

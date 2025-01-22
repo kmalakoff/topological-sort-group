@@ -1,10 +1,7 @@
 export interface GraphOptions {
-  key?: string;
+  path?: string;
+  strict?: boolean;
 }
-
-export type Counter<T extends Key> = {
-  [key in T]: number;
-};
 
 export enum SortMode {
   Group = 1,
@@ -12,18 +9,17 @@ export enum SortMode {
 }
 
 export interface SortResult<T extends Key> {
-  nodes: Array<Array<NestedKey<T> | Key>>;
-  cycles: Array<Array<NestedKey<T> | Key>>;
+  nodes: Array<Array<Value<T> | Key>>;
+  cycles: Array<Array<Value<T> | Key>>;
 }
 
 export type Key = string | number | symbol;
+export type NestedValue<T> = Record<Key, T>;
+export type Value<T extends Key> = T | NestedValue<T | NestedValue<T>>;
 
-export type NestedKey<T extends Key> = {
-  [key in T]: Key;
-};
-
+export type Counter<T extends Key, X> = Record<T, X>;
 export type NodeRecord<T extends Key> = {
-  value: NestedKey<T> | T;
+  value: Value<T>;
   edges: Array<T>;
 };
 

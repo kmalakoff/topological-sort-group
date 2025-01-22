@@ -1,7 +1,7 @@
 import type Graph from './Graph';
 import cycles from './cycles';
 
-import type { Key } from './types';
+import type { Counter, Key } from './types';
 import { SortMode } from './types';
 
 // find nodes with no incoming nodes
@@ -24,22 +24,21 @@ export default function sort<T extends Key>(graph: Graph<T>, mode: SortMode = So
 
     // track next level's nodes
     const nextLevel = [];
-    const processed = {};
+    const processed = {} as Counter<T, boolean>;
 
     // process all nodes in current level
     currentLevel.forEach((node) => {
-      const nodeKey = graph.key ? node[graph.key] : node;
+      const nodeKey = graph.key(node);
       // remove the node
       degrees[nodeKey] = -1;
 
       // reduce degrees for all neighbors
-      graph.nodeMap[nodeKey].edges.forEach((neighborKey) => {
+      graph.edges(nodeKey).forEach((neighborKey) => {
         degrees[neighborKey]--;
 
         // If neighbor has no more dependencies and hasn't been processed
-        if (degrees[neighborKey] === 0 && !processed[neighborKey]) {
-          const neighbor = graph.nodeMap[neighborKey].value;
-          nextLevel.push(neighbor);
+        if (degrees[neighborKey] === 0 && processed[neighborKey] === undefined) {
+          nextLevel.push(graph.value(neighborKey));
           processed[neighborKey] = true;
         }
       });

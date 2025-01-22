@@ -1,6 +1,6 @@
 {
   "name": "topological-sort-group",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "Topological sorting and cycle detection. Optional grouping for parallel processing",
   "keywords": [
     "topological",
@@ -34,6 +34,10 @@
     "test": "tsds test:node --no-timeouts",
     "test:engines": "nvu engines npm test",
     "version": "tsds version"
+  },
+  "dependencies": {
+    "lodash.get": "^4.4.2",
+    "lodash.isequal": "^4.5.0"
   },
   "devDependencies": {
     "@types/mocha": "*",

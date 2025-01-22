@@ -7,38 +7,26 @@ export default function cycles<T extends Key>(graph: Graph<T>): Array<Array<T>> 
   const marks = {};
   const cycles = [];
 
-  function visit(node, ancestors) {
-    // found a cycle
-    const nodeKey = graph.key ? node[graph.key] : node;
-    if (marks[nodeKey]) {
-      cycles.push(ancestors.concat(node));
-      return;
-    }
+  function visit(key, ancestors) {
+    if (marks[key]) return cycles.push(ancestors.concat(key)); // found a cycle
+    if (visited[key]) return; // already visited
+    visited[key] = true;
 
-    // visit only once
-    if (visited[nodeKey]) return;
-    visited[nodeKey] = true;
-
-    // check for cycles from here
-    marks[nodeKey] = true;
-
-    graph.nodeMap[nodeKey].edges.forEach((neighborKey) => {
-      const neighbor = graph.nodeMap[neighborKey].value;
-      visit(neighbor, ancestors.concat(node));
+    // check for cycles from this key
+    marks[key] = true;
+    graph.edges(key).forEach((neighborKey) => {
+      visit(neighborKey, ancestors.concat(key));
     });
-    delete marks[nodeKey];
+    delete marks[key];
   }
 
-  // check all nodes
-  let nodes = graph.nodes();
-  while (nodes.length > 0) {
-    visit(nodes[0], []);
+  // check all keys
+  let keys = graph.keys();
+  while (keys.length > 0) {
+    visit(keys[0], []);
 
     // remove processed
-    nodes = nodes.filter((node) => {
-      const nodeKey = graph.key ? node[graph.key] : node;
-      return !visited[nodeKey];
-    });
+    keys = keys.filter((key) => !visited[key]);
   }
 
   return cycles;

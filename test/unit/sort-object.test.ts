@@ -17,7 +17,7 @@ describe('sort object', () => {
           [{ name: 'E' }, { name: 'G' }],
           [{ name: 'F' }, { name: 'H' }],
         ],
-        { key: 'name' }
+        { path: 'name' }
       );
       const result = sort(graph, SortMode.Flat);
       assert.deepEqual(result.nodes, [{ name: 'A' }, { name: 'B' }, { name: 'C' }, { name: 'D' }, { name: 'E' }, { name: 'F' }, { name: 'G' }, { name: 'H' }]);
@@ -25,7 +25,7 @@ describe('sort object', () => {
     });
 
     it('no cycles', () => {
-      const graph = Graph.from([[{ name: 'A' }, { name: 'B' }], [{ name: 'B' }, { name: 'C' }], [{ name: 'D' }, { name: 'E' }], [{ name: 'E' }, { name: 'F' }], { name: 'H' }], { key: 'name' });
+      const graph = Graph.from([[{ name: 'A' }, { name: 'B' }], [{ name: 'B' }, { name: 'C' }], [{ name: 'D' }, { name: 'E' }], [{ name: 'E' }, { name: 'F' }], { name: 'H' }], { path: 'name' });
       const result = sort(graph, SortMode.Flat);
       assert.deepEqual(result.nodes, [{ name: 'A' }, { name: 'D' }, { name: 'H' }, { name: 'B' }, { name: 'E' }, { name: 'C' }, { name: 'F' }]);
       assert.deepEqual(result.cycles, []);
@@ -40,12 +40,12 @@ describe('sort object', () => {
           [{ name: 'E' }, { name: 'F' }],
           [{ name: 'B' }, { name: 'A' }], // Creates a cycle
         ],
-        { key: 'name' }
+        { path: 'name' }
       );
 
       const result = sort(graph, SortMode.Flat);
       assert.deepEqual(result.nodes, [{ name: 'D' }, { name: 'E' }, { name: 'F' }]);
-      assert.deepEqual(result.cycles, [[{ name: 'A' }, { name: 'B' }, { name: 'A' }]]);
+      assert.deepEqual(result.cycles, [['A', 'B', 'A']]);
     });
   });
   describe('group', () => {
@@ -61,16 +61,34 @@ describe('sort object', () => {
           [{ name: 'E' }, { name: 'G' }],
           [{ name: 'F' }, { name: 'H' }],
         ],
-        { key: 'name' }
+        { path: 'name' }
       );
-      const result = sort(graph, SortMode.Group);
+      const result = sort(graph);
       assert.deepEqual(result.nodes, [[{ name: 'A' }, { name: 'B' }], [{ name: 'C' }, { name: 'D' }], [{ name: 'E' }], [{ name: 'F' }, { name: 'G' }], [{ name: 'H' }]]);
       assert.deepEqual(result.cycles, []);
     });
 
     it('no cycles', () => {
-      const graph = Graph.from([[{ name: 'A' }, { name: 'B' }], [{ name: 'B' }, { name: 'C' }], [{ name: 'D' }, { name: 'E' }], [{ name: 'E' }, { name: 'F' }], { name: 'G' }], { key: 'name' });
-      const result = sort(graph, SortMode.Group);
+      const graph = Graph.from([[{ name: 'A' }, { name: 'B' }], [{ name: 'B' }, { name: 'C' }], [{ name: 'D' }, { name: 'E' }], [{ name: 'E' }, { name: 'F' }], { name: 'G' }], { path: 'name' });
+      const result = sort(graph);
+      assert.deepEqual(result.nodes, [
+        [{ name: 'A' }, { name: 'D' }, { name: 'G' }],
+        [{ name: 'B' }, { name: 'E' }],
+        [{ name: 'C' }, { name: 'F' }],
+      ]);
+      assert.deepEqual(result.cycles, []);
+    });
+
+    it('no cycles - strict', () => {
+      try {
+        const _graph = Graph.from([[{ name: 'A' }, { name: 'B' }], [{ name: 'B' }, { name: 'C' }], [{ name: 'D' }, { name: 'E' }], [{ name: 'E' }, { name: 'F' }], { name: 'G' }], { path: 'name', strict: true });
+        assert.ok(false);
+      } catch (err) {
+        assert.ok(!!err);
+      }
+
+      const graph = Graph.from([[{ name: 'A' }, { name: 'B' }], ['B', { name: 'C' }], [{ name: 'D' }, { name: 'E' }], ['E', { name: 'F' }], { name: 'G' }], { path: 'name', strict: true });
+      const result = sort(graph);
       assert.deepEqual(result.nodes, [
         [{ name: 'A' }, { name: 'D' }, { name: 'G' }],
         [{ name: 'B' }, { name: 'E' }],
@@ -83,12 +101,12 @@ describe('sort object', () => {
       const graph = Graph.from(
         [
           /* nodes */
-          { name: 'A' },
-          { name: 'B' },
-          { name: 'C' },
-          { name: 'D' },
-          { name: 'E' },
-          { name: 'F' },
+          { package: { name: 'A' } },
+          { package: { name: 'B' } },
+          { package: { name: 'C' } },
+          { package: { name: 'D' } },
+          { package: { name: 'E' } },
+          { package: { name: 'F' } },
           /* edges */
           ['A', 'B'],
           ['B', 'C'],
@@ -96,12 +114,12 @@ describe('sort object', () => {
           ['E', 'F'],
           ['B', 'A'], // Creates a cycle
         ],
-        { key: 'name' }
+        { path: 'package.name' }
       );
 
-      const result = sort(graph, SortMode.Group);
-      assert.deepEqual(result.nodes, [[{ name: 'D' }], [{ name: 'E' }], [{ name: 'F' }]]);
-      assert.deepEqual(result.cycles, [[{ name: 'A' }, { name: 'B' }, { name: 'A' }]]);
+      const result = sort(graph);
+      assert.deepEqual(result.nodes, [[{ package: { name: 'D' } }], [{ package: { name: 'E' } }], [{ package: { name: 'F' } }]]);
+      assert.deepEqual(result.cycles, [['A', 'B', 'A']]);
     });
   });
 });

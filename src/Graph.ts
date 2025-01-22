@@ -1,51 +1,69 @@
-import isArray from './lib/isArray';
-import type { Counter, GraphOptions, Key, NestedKey, NodeRecords } from './types';
+import get from 'lodash.get';
+import isEqual from 'lodash.isequal';
+import type { Counter, GraphOptions, Key, NodeRecords, Value } from './types';
+
+const isArray = Array.isArray || ((x) => Object.prototype.toString.call(x) === '[object Array]');
 
 export default class Graph<T extends Key> {
-  nodeMap: NodeRecords<T>;
-  key: Key | undefined;
+  private nodeMap: NodeRecords<T>;
+  private path: Key | undefined;
+  private strict: boolean;
 
   constructor(options?: GraphOptions) {
-    this.key = options ? options.key : undefined;
+    this.path = options ? options.path || undefined : undefined;
+    this.strict = options ? options.strict || false : false;
     this.nodeMap = {} as NodeRecords<T>;
   }
 
-  static from<T extends Key>(nodes: Array<Key | NestedKey<T> | Array<Key | NestedKey<T>>>, options?: GraphOptions) {
+  static from<T extends Key>(nodes: Array<Key | Value<T> | Array<Key | Value<T>>>, options?: GraphOptions) {
     const graph = new Graph(options);
-    nodes.forEach((node) => (isArray(node) ? graph.add.apply(graph, node) : graph.add(node as Key | NestedKey<T>)));
+    nodes.forEach((node) => (isArray(node) ? graph.add.apply(graph, node) : graph.add(node as Key | Value<T>)));
     return graph;
   }
 
-  add(from: Key | NestedKey<T>, to?: Key | NestedKey<T>) {
-    const fromKey = this.key ? from[this.key] || from : from;
-    if (!this.nodeMap[fromKey] && (!this.key || typeof from === 'object')) {
-      this.nodeMap[fromKey] = { value: from, edges: [] };
+  key(keyOrValue: Key | Value<T>): Key {
+    if (this.path) return typeof keyOrValue === 'object' ? get(keyOrValue, this.path) : keyOrValue;
+    return keyOrValue as Key;
+  }
+
+  keys(): Array<Key> {
+    const keys = [];
+    for (const key in this.nodeMap) keys.push(key);
+    return keys;
+  }
+
+  value(key: Key): Value<T> | T {
+    return this.nodeMap[key].value;
+  }
+
+  edges(key: Key): Array<T> {
+    return this.nodeMap[key].edges;
+  }
+
+  add(keyOrValue: Key | Value<T>, toKeyOrValue?: Key | Value<T>) {
+    const key = this.key(keyOrValue);
+    const value = this.path ? (typeof keyOrValue === 'object' ? keyOrValue : undefined) : keyOrValue;
+    if (value !== undefined) {
+      if (this.nodeMap[key] === undefined) this.nodeMap[key] = { value, edges: [] };
+      else if (this.strict && this.nodeMap[key].value !== value) throw new Error(`Adding different node values to same graph. Key ${key as string}. Existing: ${JSON.stringify(this.nodeMap[key].value)}. New: ${JSON.stringify(value)}. Strict mode: ${this.strict}`);
+      else if (!this.strict && !isEqual(this.nodeMap[key].value, value)) throw new Error(`Adding different node values to same graph. Key ${key as string}. Existing: ${JSON.stringify(this.nodeMap[key].value)}. New: ${JSON.stringify(value)}. Strict mode: ${this.strict}`);
     }
-    if (to === undefined) return;
+    // biome-ignore lint/style/noArguments: <explanation>
+    if (arguments.length === 1) return;
 
     // add edge
-    const toKey = this.key ? to[this.key] || to : to;
-    if (!this.nodeMap[toKey] && (!this.key || typeof to === 'object')) {
-      this.nodeMap[toKey] = { value: to, edges: [] };
-    }
-    this.nodeMap[fromKey].edges.push(toKey);
+    this.add(toKeyOrValue);
+    const toKey = this.key(toKeyOrValue);
+    this.nodeMap[key].edges.push(toKey);
   }
 
-  nodes(): Array<NestedKey<T> | T> {
-    const nodes = [];
-    for (const from in this.nodeMap) {
-      nodes.push(this.nodeMap[from].value);
-    }
-    return nodes;
-  }
-
-  degrees<T extends Key>(): Counter<T> {
-    const degrees = {} as Counter<T>;
+  degrees<T extends Key>(): Counter<T, number> {
+    const degrees = {} as Counter<T, number>;
     for (const from in this.nodeMap) {
       if (degrees[from as Key] === undefined) degrees[from as Key] = 0;
-      this.nodeMap[from].edges.forEach((toKey: Key) => {
-        if (degrees[toKey] === undefined) degrees[toKey] = 0;
-        degrees[toKey]++;
+      this.nodeMap[from].edges.forEach((key: Key) => {
+        if (degrees[key] === undefined) degrees[key] = 0;
+        degrees[key]++;
       });
     }
     return degrees;
