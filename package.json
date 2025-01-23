@@ -1,6 +1,6 @@
 {
   "name": "topological-sort-group",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Topological sorting and cycle detection. Optional grouping for parallel processing",
   "keywords": [
     "topological",
