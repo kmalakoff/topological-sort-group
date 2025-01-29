@@ -1,11 +1,11 @@
-import get from 'get-value';
+import get from './lib/get-value';
 import type { Counter, GraphOptions, Key, NodeRecords, Value } from './types';
 
 const isArray = Array.isArray || ((x) => Object.prototype.toString.call(x) === '[object Array]');
 
 export default class Graph<T extends Key> {
   private nodeMap: NodeRecords<T>;
-  private path: Key | undefined;
+  private path: string | undefined;
 
   constructor(options?: GraphOptions) {
     this.path = options ? options.path || undefined : undefined;
@@ -19,7 +19,7 @@ export default class Graph<T extends Key> {
   }
 
   key(keyOrValue: Key | Value<T>): Key {
-    if (this.path) return typeof keyOrValue === 'object' ? get(keyOrValue, this.path) : keyOrValue;
+    if (this.path) return typeof keyOrValue === 'object' ? (get(keyOrValue, this.path) as Key) : keyOrValue;
     return keyOrValue as Key;
   }
 
