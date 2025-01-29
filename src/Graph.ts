@@ -1,4 +1,4 @@
-import get from './lodash.get/index.cjs';
+import get from './deepGet';
 import type { Counter, GraphOptions, Key, NodeRecords, Value } from './types';
 
 const isArray = Array.isArray || ((x) => Object.prototype.toString.call(x) === '[object Array]');
