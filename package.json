@@ -35,9 +35,6 @@
     "test:engines": "nvu engines npm test",
     "version": "tsds version"
   },
-  "dependencies": {
-    "get-value": "^3.0.1"
-  },
   "devDependencies": {
     "@types/mocha": "*",
     "@types/node": "*"
