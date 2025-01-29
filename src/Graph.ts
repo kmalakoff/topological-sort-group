@@ -1,4 +1,4 @@
-import get from './lib/get-value';
+import get from './lodash.get/index.cjs';
 import type { Counter, GraphOptions, Key, NodeRecords, Value } from './types';
 
 const isArray = Array.isArray || ((x) => Object.prototype.toString.call(x) === '[object Array]');
