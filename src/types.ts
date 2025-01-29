@@ -1,6 +1,5 @@
 export interface GraphOptions {
   path?: string;
-  strict?: boolean;
 }
 
 export enum SortMode {

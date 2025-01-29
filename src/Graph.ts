@@ -1,5 +1,4 @@
-import get from 'lodash.get';
-import isEqual from 'lodash.isequal';
+import get from 'get-value';
 import type { Counter, GraphOptions, Key, NodeRecords, Value } from './types';
 
 const isArray = Array.isArray || ((x) => Object.prototype.toString.call(x) === '[object Array]');
@@ -7,11 +6,9 @@ const isArray = Array.isArray || ((x) => Object.prototype.toString.call(x) === '
 export default class Graph<T extends Key> {
   private nodeMap: NodeRecords<T>;
   private path: Key | undefined;
-  private strict: boolean;
 
   constructor(options?: GraphOptions) {
     this.path = options ? options.path || undefined : undefined;
-    this.strict = options ? options.strict || false : false;
     this.nodeMap = {} as NodeRecords<T>;
   }
 
@@ -45,8 +42,7 @@ export default class Graph<T extends Key> {
     const value = this.path ? (typeof keyOrValue === 'object' ? keyOrValue : undefined) : keyOrValue;
     if (value !== undefined) {
       if (this.nodeMap[key] === undefined) this.nodeMap[key] = { value, edges: [] };
-      else if (this.strict && this.nodeMap[key].value !== value) throw new Error(`Adding different node values to same graph. Key ${key as string}. Existing: ${JSON.stringify(this.nodeMap[key].value)}. New: ${JSON.stringify(value)}. Strict mode: ${this.strict}`);
-      else if (!this.strict && !isEqual(this.nodeMap[key].value, value)) throw new Error(`Adding different node values to same graph. Key ${key as string}. Existing: ${JSON.stringify(this.nodeMap[key].value)}. New: ${JSON.stringify(value)}. Strict mode: ${this.strict}`);
+      else if (this.nodeMap[key].value !== value) throw new Error(`Adding different node values to same graph. Key ${key as string}. Existing: ${JSON.stringify(this.nodeMap[key].value)}. New: ${JSON.stringify(value)}`);
     }
     // biome-ignore lint/style/noArguments: <explanation>
     if (arguments.length === 1) return;

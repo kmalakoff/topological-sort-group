@@ -36,8 +36,7 @@
     "version": "tsds version"
   },
   "dependencies": {
-    "lodash.get": "^4.4.2",
-    "lodash.isequal": "^4.5.0"
+    "get-value": "^3.0.1"
   },
   "devDependencies": {
     "@types/mocha": "*",

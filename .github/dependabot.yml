@@ -4,6 +4,8 @@ updates:
     directory: '/'
     schedule:
       interval: weekly
+    ignore:
+      - dependency-name: 'get-value'
   - package-ecosystem: 'github-actions'
     directory: '/'
     schedule:
