@@ -2,10 +2,10 @@ export interface GraphOptions {
   path?: string;
 }
 
-export enum SortMode {
-  Group = 1,
-  Flat = 2,
-}
+export const SortMode = {
+  Group: 1,
+  Flat: 2,
+} as const;
 
 export interface SortResult<T extends Key> {
   nodes: Array<Array<Value<T> | Key>>;
