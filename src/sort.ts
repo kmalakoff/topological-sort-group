@@ -13,7 +13,7 @@ function findRoots(graph, degrees) {
   return sources;
 }
 
-export default function sort<T extends Key>(graph: Graph<T>, mode: SortMode = SortMode.Group) {
+export default function sort<T extends Key>(graph: Graph<T>, mode: (typeof SortMode)[keyof typeof SortMode] = SortMode.Group) {
   const degrees = graph.degrees();
 
   // process the nodes level by level
