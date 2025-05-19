@@ -1,6 +1,6 @@
-import type Graph from './Graph';
+import type Graph from './Graph.js';
 
-import type { Key } from './types';
+import type { Key } from './types.js';
 
 export default function cycles<T extends Key>(graph: Graph<T>): Array<Array<T>> {
   const visited = {};
