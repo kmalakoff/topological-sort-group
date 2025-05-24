@@ -3,7 +3,7 @@
 type GetReturnType<T> = T | undefined;
 type ValueType = Record<string | number, unknown>;
 
-export default function deepGet<T>(value: unknown, query: string | Array<string | number>, defaultVal: GetReturnType<T> = undefined): GetReturnType<T> {
+export default function deepGet<T>(value: unknown, query: string | string[] | number[], defaultVal: GetReturnType<T> = undefined): GetReturnType<T> {
   const splitQuery = Array.isArray(query)
     ? query
     : query

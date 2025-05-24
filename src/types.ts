@@ -7,9 +7,10 @@ export const SortMode = {
   Flat: 2,
 } as const;
 
+export type Node<T extends Key> = Value<T> | Key;
 export interface SortResult<T extends Key> {
-  nodes: Array<Array<Value<T> | Key>>;
-  cycles: Array<Array<Value<T> | Key>>;
+  nodes: Node<T>[][];
+  cycles: Value<T>[] | Key[];
 }
 
 export type Key = string | number | symbol;
@@ -19,7 +20,7 @@ export type Value<T extends Key> = T | NestedValue<T | NestedValue<T>>;
 export type Counter<T extends Key, X> = Record<T, X>;
 export type NodeRecord<T extends Key> = {
   value: Value<T>;
-  edges: Array<T>;
+  edges: T[];
 };
 
 export type NodeRecords<T extends Key> = {
