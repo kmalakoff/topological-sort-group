@@ -1,5 +1,5 @@
 import get from './deepGet.js';
-import type { Counter, GraphOptions, Key, NodeRecords, Value } from './types.js';
+import type { Counter, GraphOptions, Key, Node, NodeRecords, Value } from './types.js';
 
 const isArray = Array.isArray || ((x) => Object.prototype.toString.call(x) === '[object Array]');
 
@@ -12,7 +12,7 @@ export default class Graph<T extends Key> {
     this.nodeMap = {} as NodeRecords<T>;
   }
 
-  static from<T extends Key>(nodes: Array<Key | Value<T> | Array<Key | Value<T>>>, options?: GraphOptions) {
+  static from<T extends Key>(nodes: Node<T>[] | Node<T>[][], options?: GraphOptions) {
     const graph = new Graph(options);
     nodes.forEach((node) => (isArray(node) ? graph.add.apply(graph, node) : graph.add(node as Key | Value<T>)));
     return graph;
@@ -23,7 +23,7 @@ export default class Graph<T extends Key> {
     return keyOrValue as Key;
   }
 
-  keys(): Array<Key> {
+  keys(): Key[] {
     const keys = [];
     for (const key in this.nodeMap) keys.push(key);
     return keys;
@@ -33,7 +33,7 @@ export default class Graph<T extends Key> {
     return this.nodeMap[key].value;
   }
 
-  edges(key: Key): Array<T> {
+  edges(key: Key): T[] {
     return this.nodeMap[key].edges;
   }
 
