@@ -1,8 +1,8 @@
 import type Graph from './Graph.js';
 
-import type { Key } from './types.js';
+import type { Cycle, Key } from './types.js';
 
-export default function cycles<T extends Key>(graph: Graph<T>): T[][] {
+export default function cycles<T extends Key>(graph: Graph<T>): Cycle<T>[] {
   const visited = {};
   const marks = {};
   const cycles = [];
