@@ -2,7 +2,7 @@ import type Graph from './Graph.js';
 import cycles from './cycles.js';
 
 import type { Counter, Key } from './types.js';
-import { SortMode } from './types.js';
+import { SortMode, type SortResult } from './types.js';
 
 // find nodes with no incoming nodes
 function findRoots(graph, degrees) {
@@ -13,7 +13,7 @@ function findRoots(graph, degrees) {
   return sources;
 }
 
-export default function sort<T extends Key>(graph: Graph<T>, mode: (typeof SortMode)[keyof typeof SortMode] = SortMode.Group) {
+export default function sort<T extends Key>(graph: Graph<T>, mode: (typeof SortMode)[keyof typeof SortMode] = SortMode.Group): SortResult<T> {
   const degrees = graph.degrees();
 
   // process the nodes level by level
@@ -59,6 +59,6 @@ export default function sort<T extends Key>(graph: Graph<T>, mode: (typeof SortM
 
   return {
     nodes: mode === SortMode.Flat ? nodes.reduce((m, l) => m.concat(l), []) : nodes,
-    cycles: hasCycles ? cycles(graph) : [],
+    cycles: hasCycles ? cycles<T>(graph) : [],
   };
 }
