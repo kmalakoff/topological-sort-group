@@ -1,13 +1,20 @@
 import type Graph from './Graph.js';
 
-import type { Cycle, Key } from './types.js';
+import type { Cycle, Key, Node } from './types.js';
 
-export default function cycles<T extends Key>(graph: Graph<T>): Cycle<T>[] {
-  const visited = {};
-  const marks = {};
-  const cycles = [];
+interface Visited {
+  [key: Key]: boolean;
+}
+interface Marked {
+  [key: Key]: boolean;
+}
 
-  function visit(key, ancestors) {
+export default function cycles<T extends Key>(graph: Graph<T>): Cycle[] {
+  const visited: Visited = {};
+  const marks: Marked = {};
+  const cycles: Cycle[] = [];
+
+  function visit(key: Key, ancestors: Cycle) {
     if (marks[key]) return cycles.push(ancestors.concat(key)); // found a cycle
     if (visited[key]) return; // already visited
     visited[key] = true;
@@ -21,7 +28,7 @@ export default function cycles<T extends Key>(graph: Graph<T>): Cycle<T>[] {
   }
 
   // check all keys
-  let keys = graph.keys();
+  let keys: Key[] = graph.keys();
   while (keys.length > 0) {
     visit(keys[0], []);
 
