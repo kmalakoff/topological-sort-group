@@ -7,11 +7,11 @@ export const SortMode = {
   Flat: 2,
 } as const;
 
-export type Cycle<T extends Key> = Value<T> | Key;
+export type Cycle = Key[];
 export type Node<T extends Key> = Value<T> | Key;
 export interface SortResult<T extends Key> {
   nodes: Node<T>[][];
-  cycles: Cycle<T>[];
+  cycles: Cycle[];
 }
 
 export type Key = string | number | symbol;
