@@ -2,7 +2,7 @@ import assert from 'assert';
 // @ts-ignore
 import * as topo from 'topological-sort-group';
 // @ts-ignore
-import { Graph, SortMode, cycles, sort } from 'topological-sort-group';
+import { cycles, Graph, SortMode, sort } from 'topological-sort-group';
 
 describe('exports .ts', () => {
   it('exports', () => {
