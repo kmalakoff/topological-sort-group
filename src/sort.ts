@@ -1,5 +1,5 @@
-import type Graph from './Graph.js';
 import cycles from './cycles.js';
+import type Graph from './Graph.js';
 
 import type { Counter, Key } from './types.js';
 import { SortMode, type SortResult } from './types.js';

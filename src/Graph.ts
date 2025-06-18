@@ -44,7 +44,7 @@ export default class Graph<T extends Key> {
       if (this.nodeMap[key] === undefined) this.nodeMap[key] = { value, edges: [] };
       else if (this.nodeMap[key].value !== value) throw new Error(`Adding different node values to same graph. Key ${key as string}. Existing: ${JSON.stringify(this.nodeMap[key].value)}. New: ${JSON.stringify(value)}`);
     }
-    // biome-ignore lint/style/noArguments: <explanation>
+    // biome-ignore lint/complexity/noArguments: Apply arguments
     if (arguments.length === 1) return;
 
     // add edge

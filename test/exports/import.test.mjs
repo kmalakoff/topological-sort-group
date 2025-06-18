@@ -1,6 +1,6 @@
 import assert from 'assert';
 import * as topo from 'topological-sort-group';
-import { Graph, SortMode, cycles, sort } from 'topological-sort-group';
+import { cycles, Graph, SortMode, sort } from 'topological-sort-group';
 
 describe('exports .mjs', () => {
   it('exports', () => {
