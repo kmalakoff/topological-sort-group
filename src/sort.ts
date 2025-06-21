@@ -1,8 +1,8 @@
-import cycles from './cycles.js';
-import type Graph from './Graph.js';
+import cycles from './cycles.ts';
+import type Graph from './Graph.ts';
 
-import type { Counter, Key } from './types.js';
-import { SortMode, type SortResult } from './types.js';
+import type { Counter, Key } from './types.ts';
+import { SortMode, type SortResult } from './types.ts';
 
 // find nodes with no incoming nodes
 function findRoots(graph, degrees) {
