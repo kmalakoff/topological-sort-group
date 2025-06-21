@@ -1,5 +1,5 @@
-import get from './deepGet.js';
-import type { Counter, GraphOptions, Key, Node, NodeRecords, Value } from './types.js';
+import get from './deepGet.ts';
+import type { Counter, GraphOptions, Key, Node, NodeRecords, Value } from './types.ts';
 
 const isArray = Array.isArray || ((x) => Object.prototype.toString.call(x) === '[object Array]');
 

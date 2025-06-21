@@ -1,6 +1,6 @@
-import type Graph from './Graph.js';
+import type Graph from './Graph.ts';
 
-import type { Cycle, Key } from './types.js';
+import type { Cycle, Key } from './types.ts';
 
 interface Visited {
   [key: Key]: boolean;

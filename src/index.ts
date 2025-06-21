@@ -1,4 +1,4 @@
-export { default as cycles } from './cycles.js';
-export { default as Graph } from './Graph.js';
-export { default as sort } from './sort.js';
-export * from './types.js';
+export { default as cycles } from './cycles.ts';
+export { default as Graph } from './Graph.ts';
+export { default as sort } from './sort.ts';
+export * from './types.ts';
