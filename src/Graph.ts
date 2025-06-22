@@ -12,7 +12,7 @@ export default class Graph<T extends Key> {
     this.nodeMap = {} as NodeRecords<T>;
   }
 
-  static from<T extends Key>(nodes: Node<T>[] | Node<T>[][], options?: GraphOptions) {
+  static from<T extends Key>(nodes: Array<Node<T> | Node<T>[]>, options?: GraphOptions) {
     const graph = new Graph(options);
     nodes.forEach((node) => (isArray(node) ? graph.add.apply(graph, node) : graph.add(node as Key | Value<T>)));
     return graph;
