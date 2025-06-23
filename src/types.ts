@@ -7,16 +7,17 @@ export const SortMode = {
   Flat: 2,
 } as const;
 
-export type Cycle = Key[];
-export type Node<T extends Key> = Value<T> | Key;
+export type Cycle<T extends Key> = T[];
+export type Node<T extends Key> = Value<T> | T;
 export interface SortResult<T extends Key> {
   nodes: Node<T>[][];
-  cycles: Cycle[];
+  cycles: Cycle<T>[];
 }
 
 export type Key = string | number | symbol;
 export type NestedValue<T> = Record<Key, T>;
 export type Value<T extends Key> = T | NestedValue<T | NestedValue<T>>;
+export type EdgeRef<T extends Key> = [Node<T>, Node<T>];
 
 export type Counter<T extends Key, X> = Record<T, X>;
 export type NodeRecord<T extends Key> = {
