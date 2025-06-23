@@ -9,12 +9,12 @@ interface Marked {
   [key: Key]: boolean;
 }
 
-export default function cycles<T extends Key>(graph: Graph<T>): Cycle[] {
+export default function cycles<T extends Key>(graph: Graph<T>): Cycle<T>[] {
   const visited: Visited = {};
   const marks: Marked = {};
-  const cycles: Cycle[] = [];
+  const cycles: Cycle<T>[] = [];
 
-  function visit(key: Key, ancestors: Cycle) {
+  function visit(key: T, ancestors: Cycle<T>) {
     if (marks[key]) return cycles.push(ancestors.concat(key)); // found a cycle
     if (visited[key]) return; // already visited
     visited[key] = true;
@@ -28,7 +28,7 @@ export default function cycles<T extends Key>(graph: Graph<T>): Cycle[] {
   }
 
   // check all keys
-  let keys: Key[] = graph.keys();
+  let keys: T[] = graph.keys();
   while (keys.length > 0) {
     visit(keys[0], []);
 
