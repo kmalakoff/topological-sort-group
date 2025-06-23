@@ -3,6 +3,14 @@ import assert from 'assert';
 // @ts-ignore
 import { Graph, SortMode, sort } from 'topological-sort-group';
 
+interface Named {
+  name: string;
+}
+
+interface Nested {
+  package: Named;
+}
+
 const A = { name: 'A' };
 const B = { name: 'B' };
 const C = { name: 'C' };
@@ -15,7 +23,7 @@ const H = { name: 'H' };
 describe('sort object', () => {
   describe('flat', () => {
     it('no cycles', () => {
-      const graph = Graph.from(
+      const graph = Graph.from<Named>(
         [
           [A, C],
           [B, C],
@@ -34,14 +42,14 @@ describe('sort object', () => {
     });
 
     it('no cycles', () => {
-      const graph = Graph.from([[A, B], [B, C], [D, E], [E, F], H], { path: 'name' });
+      const graph = Graph.from<Named>([[A, B], [B, C], [D, E], [E, F], H], { path: 'name' });
       const result = sort(graph, SortMode.Flat);
       assert.deepEqual(result.nodes, [A, D, H, B, E, C, F]);
       assert.deepEqual(result.cycles, []);
     });
 
     it('with cycles', () => {
-      const graph = Graph.from(
+      const graph = Graph.from<Named>(
         [
           [A, B],
           [B, C],
@@ -59,7 +67,7 @@ describe('sort object', () => {
   });
   describe('group', () => {
     it('no cycles', () => {
-      const graph = Graph.from(
+      const graph = Graph.from<Named>(
         [
           [A, C],
           [B, C],
@@ -78,7 +86,7 @@ describe('sort object', () => {
     });
 
     it('no cycles', () => {
-      const graph = Graph.from([[A, B], [B, C], [D, E], [E, F], G], { path: 'name' });
+      const graph = Graph.from<Named>([[A, B], [B, C], [D, E], [E, F], G], { path: 'name' });
       const result = sort(graph);
       assert.deepEqual(result.nodes, [
         [A, D, G],
@@ -89,7 +97,7 @@ describe('sort object', () => {
     });
 
     it('with cycles', () => {
-      const graph = Graph.from(
+      const graph = Graph.from<Nested>(
         [
           /* nodes */
           { package: A },
@@ -116,7 +124,7 @@ describe('sort object', () => {
   describe('errors', () => {
     it('no cycles', () => {
       try {
-        const _graph = Graph.from(
+        const _graph = Graph.from<Named>(
           [
             [A, C],
             [B, C],
