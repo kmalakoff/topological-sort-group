@@ -1,7 +1,7 @@
 import cycles from './cycles.ts';
 import type Graph from './Graph.ts';
 
-import type { Counter, Key } from './types.ts';
+import type { Key } from './types.ts';
 import { SortMode, type SortResult } from './types.ts';
 
 // find nodes with no incoming nodes
@@ -13,7 +13,7 @@ function findRoots(graph, degrees) {
   return sources;
 }
 
-export default function sort<T extends Key>(graph: Graph<T>, mode: (typeof SortMode)[keyof typeof SortMode] = SortMode.Group): SortResult<T> {
+export default function sort<T>(graph: Graph<T>, mode: (typeof SortMode)[keyof typeof SortMode] = SortMode.Group): SortResult<T> {
   const degrees = graph.degrees();
 
   // process the nodes level by level
@@ -24,7 +24,7 @@ export default function sort<T extends Key>(graph: Graph<T>, mode: (typeof SortM
 
     // track next level's nodes
     const nextLevel = [];
-    const processed = {} as Counter<T, boolean>;
+    const processed = {} as Record<Key, boolean>;
 
     // process all nodes in current level
     currentLevel.forEach((node) => {

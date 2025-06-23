@@ -2,19 +2,12 @@ import type Graph from './Graph.ts';
 
 import type { Cycle, Key } from './types.ts';
 
-interface Visited {
-  [key: Key]: boolean;
-}
-interface Marked {
-  [key: Key]: boolean;
-}
+export default function cycles<T>(graph: Graph<T>): Cycle[] {
+  const visited: Record<Key, boolean> = {};
+  const marks: Record<Key, boolean> = {};
+  const cycles: Cycle[] = [];
 
-export default function cycles<T extends Key>(graph: Graph<T>): Cycle<T>[] {
-  const visited: Visited = {};
-  const marks: Marked = {};
-  const cycles: Cycle<T>[] = [];
-
-  function visit(key: T, ancestors: Cycle<T>) {
+  function visit(key: Key, ancestors: Cycle) {
     if (marks[key]) return cycles.push(ancestors.concat(key)); // found a cycle
     if (visited[key]) return; // already visited
     visited[key] = true;
@@ -28,7 +21,7 @@ export default function cycles<T extends Key>(graph: Graph<T>): Cycle<T>[] {
   }
 
   // check all keys
-  let keys: T[] = graph.keys();
+  let keys: Key[] = graph.keys();
   while (keys.length > 0) {
     visit(keys[0], []);
 

@@ -1,47 +1,47 @@
 import get from './deepGet.ts';
-import type { Counter, EdgeRef, GraphOptions, Key, Node, NodeRecords, Value } from './types.ts';
+import type { GraphOptions, Key, Node } from './types.ts';
 
 const isArray = Array.isArray || ((x) => Object.prototype.toString.call(x) === '[object Array]');
 
-export default class Graph<T extends Key> {
-  private nodeMap: NodeRecords<T>;
+export default class Graph<T> {
+  private nodeMap: Record<Key, Node<T>>;
   private path: string | undefined;
 
   constructor(options?: GraphOptions) {
     this.path = options ? options.path || undefined : undefined;
-    this.nodeMap = {} as NodeRecords<T>;
+    this.nodeMap = {};
   }
 
-  static from<T extends Key>(nodes: Array<Node<T> | EdgeRef<T>>, options?: GraphOptions) {
-    const graph = new Graph(options);
-    nodes.forEach((node) => (isArray(node) ? graph.add.apply(graph, node) : graph.add(node as T | Value<T>)));
+  static from<T>(values: Array<Key | T | [Key | T, Key | T]>, options?: GraphOptions): Graph<T> {
+    const graph = new Graph<T>(options);
+    values.forEach((value) => (isArray(value) ? graph.add(value[0], value[1]) : graph.add(value as T)));
     return graph;
   }
 
-  key(keyOrValue: T | Value<T>): T {
-    if (this.path) return typeof keyOrValue === 'object' ? (get(keyOrValue, this.path) as T) : keyOrValue;
-    return keyOrValue as T;
+  key(keyOrValue: Key | T): Key {
+    if (this.path) return typeof keyOrValue === 'object' ? (get(keyOrValue, this.path) as Key) : (keyOrValue as Key);
+    return keyOrValue as Key;
   }
 
-  keys(): T[] {
+  keys(): Key[] {
     const keys = [];
     for (const key in this.nodeMap) keys.push(key);
     return keys;
   }
 
-  value(key: T): Value<T> | T {
+  value(key: Key): T {
     return this.nodeMap[key].value;
   }
 
-  edges(key: T): T[] {
+  edges(key: Key): Key[] {
     return this.nodeMap[key].edges;
   }
 
-  add(keyOrValue: T | Value<T>, toKeyOrValue?: T | Value<T>) {
+  add(keyOrValue: Key | T, toKeyOrValue?: Key | T) {
     const key = this.key(keyOrValue);
-    const value = this.path ? (typeof keyOrValue === 'object' ? keyOrValue : undefined) : keyOrValue;
+    const value = this.path ? (typeof keyOrValue === 'object' ? keyOrValue : undefined) : (keyOrValue as T);
     if (value !== undefined) {
-      if (this.nodeMap[key] === undefined) this.nodeMap[key] = { value, edges: [] };
+      if (this.nodeMap[key] === undefined) this.nodeMap[key] = { value: value as T, edges: [] } as Node<T>;
       else if (this.nodeMap[key].value !== value) throw new Error(`Adding different node values to same graph. Key ${key as string}. Existing: ${JSON.stringify(this.nodeMap[key].value)}. New: ${JSON.stringify(value)}`);
     }
     // biome-ignore lint/complexity/noArguments: Apply arguments
@@ -53,11 +53,11 @@ export default class Graph<T extends Key> {
     this.nodeMap[key].edges.push(toKey);
   }
 
-  degrees(): Counter<T, number> {
-    const degrees = {} as Counter<T, number>;
+  degrees(): Record<Key, number> {
+    const degrees = {} as Record<Key, number>;
     for (const from in this.nodeMap) {
-      if (degrees[from as T] === undefined) degrees[from as T] = 0;
-      this.nodeMap[from].edges.forEach((key: T) => {
+      if (degrees[from as Key] === undefined) degrees[from as Key] = 0;
+      this.nodeMap[from].edges.forEach((key: Key) => {
         if (degrees[key] === undefined) degrees[key] = 0;
         degrees[key]++;
       });

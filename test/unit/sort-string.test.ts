@@ -6,7 +6,7 @@ import { Graph, SortMode, sort } from 'topological-sort-group';
 describe('sort strings', () => {
   describe('flat', () => {
     it('no cycles', () => {
-      const graph = Graph.from([
+      const graph = Graph.from<string>([
         ['A', 'C'],
         ['B', 'C'],
         ['B', 'D'],
@@ -22,14 +22,14 @@ describe('sort strings', () => {
     });
 
     it('no cycles', () => {
-      const graph = Graph.from([['A', 'B'], ['B', 'C'], ['D', 'E'], ['E', 'F'], 'H']);
+      const graph = Graph.from<string>([['A', 'B'], ['B', 'C'], ['D', 'E'], ['E', 'F'], 'H']);
       const result = sort(graph, SortMode.Flat);
       assert.deepEqual(result.nodes, ['A', 'D', 'H', 'B', 'E', 'C', 'F']);
       assert.deepEqual(result.cycles, []);
     });
 
     it('with cycles', () => {
-      const graph = Graph.from([
+      const graph = Graph.from<string>([
         ['A', 'B'],
         ['B', 'C'],
         ['D', 'E'],
@@ -44,7 +44,7 @@ describe('sort strings', () => {
   });
   describe('group', () => {
     it('no cycles', () => {
-      const graph = Graph.from([
+      const graph = Graph.from<string>([
         ['A', 'C'],
         ['B', 'C'],
         ['B', 'D'],
@@ -60,7 +60,7 @@ describe('sort strings', () => {
     });
 
     it('no cycles', () => {
-      const graph = Graph.from([['A', 'B'], ['B', 'C'], ['D', 'E'], ['E', 'F'], 'G']);
+      const graph = Graph.from<string>([['A', 'B'], ['B', 'C'], ['D', 'E'], ['E', 'F'], 'G']);
       const result = sort(graph);
       assert.deepEqual(result.nodes, [
         ['A', 'D', 'G'],
@@ -71,7 +71,7 @@ describe('sort strings', () => {
     });
 
     it('with cycles', () => {
-      const graph = Graph.from([
+      const graph = Graph.from<string>([
         ['A', 'B'],
         ['B', 'C'],
         ['D', 'E'],
