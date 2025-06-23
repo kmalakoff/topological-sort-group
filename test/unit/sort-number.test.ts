@@ -6,7 +6,7 @@ import { Graph, SortMode, sort } from 'topological-sort-group';
 describe('sort numbers', () => {
   describe('flat', () => {
     it('no cycles', () => {
-      const graph = Graph.from([
+      const graph = Graph.from<number>([
         [1, 3],
         [2, 3],
         [2, 4],
@@ -22,14 +22,14 @@ describe('sort numbers', () => {
     });
 
     it('no cycles', () => {
-      const graph = Graph.from([[1, 2], [2, 3], [4, 5], [5, 6], 8]);
+      const graph = Graph.from<number>([[1, 2], [2, 3], [4, 5], [5, 6], 8]);
       const result = sort(graph, SortMode.Flat);
       assert.deepEqual(result.nodes, [1, 4, 8, 2, 5, 3, 6]);
       assert.deepEqual(result.cycles, []);
     });
 
     it('with cycles', () => {
-      const graph = Graph.from([
+      const graph = Graph.from<number>([
         [1, 2],
         [2, 3],
         [4, 5],
@@ -44,7 +44,7 @@ describe('sort numbers', () => {
   });
   describe('group', () => {
     it('no cycles', () => {
-      const graph = Graph.from([
+      const graph = Graph.from<number>([
         [1, 3],
         [2, 3],
         [2, 4],
@@ -60,7 +60,7 @@ describe('sort numbers', () => {
     });
 
     it('no cycles', () => {
-      const graph = Graph.from([[1, 2], [2, 3], [4, 5], [5, 6], 7]);
+      const graph = Graph.from<number>([[1, 2], [2, 3], [4, 5], [5, 6], 7]);
       const result = sort(graph);
       assert.deepEqual(result.nodes, [
         [1, 4, 7],
@@ -71,7 +71,7 @@ describe('sort numbers', () => {
     });
 
     it('with cycles', () => {
-      const graph = Graph.from([
+      const graph = Graph.from<number>([
         [1, 2],
         [2, 3],
         [4, 5],
