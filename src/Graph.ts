@@ -6,16 +6,22 @@ const isArray = Array.isArray || ((x) => Object.prototype.toString.call(x) === '
 export default class Graph<T> {
   private nodeMap: Record<Key, Node<T>>;
   private path: string | undefined;
+  private _size: number;
 
   constructor(options?: GraphOptions) {
     this.path = options ? options.path || undefined : undefined;
     this.nodeMap = {};
+    this._size = 0;
   }
 
   static from<T>(values: Array<Key | T | [Key | T, Key | T]>, options?: GraphOptions): Graph<T> {
     const graph = new Graph<T>(options);
     values.forEach((value) => (isArray(value) ? graph.add(value[0], value[1]) : graph.add(value as T)));
     return graph;
+  }
+
+  size() {
+    return this._size;
   }
 
   key(keyOrValue: Key | T): Key {
@@ -41,8 +47,10 @@ export default class Graph<T> {
     const key = this.key(keyOrValue);
     const value = this.path ? (typeof keyOrValue === 'object' ? keyOrValue : undefined) : (keyOrValue as T);
     if (value !== undefined) {
-      if (this.nodeMap[key] === undefined) this.nodeMap[key] = { value: value as T, edges: [] } as Node<T>;
-      else if (this.nodeMap[key].value !== value) throw new Error(`Adding different node values to same graph. Key ${key as string}. Existing: ${JSON.stringify(this.nodeMap[key].value)}. New: ${JSON.stringify(value)}`);
+      if (this.nodeMap[key] === undefined) {
+        this.nodeMap[key] = { value: value as T, edges: [] } as Node<T>;
+        this._size++;
+      } else if (this.nodeMap[key].value !== value) throw new Error(`Adding different node values to same graph. Key ${key as string}. Existing: ${JSON.stringify(this.nodeMap[key].value)}. New: ${JSON.stringify(value)}`);
     }
     // biome-ignore lint/complexity/noArguments: Apply arguments
     if (arguments.length === 1) return;
