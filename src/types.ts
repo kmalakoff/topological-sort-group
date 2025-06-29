@@ -6,6 +6,7 @@ export const SortMode = {
   Group: 1,
   Flat: 2,
 } as const;
+export type SortModeEnum = (typeof SortMode)[keyof typeof SortMode];
 
 export type Key = string | number | symbol;
 export type Node<T = Key> = {
