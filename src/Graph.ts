@@ -13,7 +13,7 @@ export default class Graph<T> {
 
   constructor(options?: GraphOptions) {
     this.size = 0;
-    this.path = options ? options.path : undefined;
+    this.path = options?.path;
     this.nodeMap = {};
   }
 
