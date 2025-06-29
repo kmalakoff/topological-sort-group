@@ -1,7 +1,7 @@
 import assert from 'assert';
 
 // @ts-ignore
-import { Graph, SortMode, sort } from 'topological-sort-group';
+import Graph, { SortMode } from 'topological-sort-group';
 
 interface Named {
   name: string;
@@ -36,14 +36,14 @@ describe('sort object', () => {
         ],
         { path: 'name' }
       );
-      const result = sort(graph, SortMode.Flat);
+      const result = graph.sort(SortMode.Flat);
       assert.deepEqual(result.nodes, [A, B, C, D, E, F, G, H]);
       assert.deepEqual(result.cycles, []);
     });
 
     it('no cycles', () => {
       const graph = Graph.from<Named>([[A, B], [B, C], [D, E], [E, F], H], { path: 'name' });
-      const result = sort(graph, SortMode.Flat);
+      const result = graph.sort(SortMode.Flat);
       assert.deepEqual(result.nodes, [A, D, H, B, E, C, F]);
       assert.deepEqual(result.cycles, []);
     });
@@ -60,7 +60,7 @@ describe('sort object', () => {
         { path: 'name' }
       );
 
-      const result = sort(graph, SortMode.Flat);
+      const result = graph.sort(SortMode.Flat);
       assert.deepEqual(result.nodes, [D, E, F]);
       assert.deepEqual(result.cycles, [['A', 'B', 'A']]);
     });
@@ -80,14 +80,14 @@ describe('sort object', () => {
         ],
         { path: 'name' }
       );
-      const result = sort(graph);
+      const result = graph.sort();
       assert.deepEqual(result.nodes, [[A, B], [C, D], [E], [F, G], [H]]);
       assert.deepEqual(result.cycles, []);
     });
 
     it('no cycles', () => {
       const graph = Graph.from<Named>([[A, B], [B, C], [D, E], [E, F], G], { path: 'name' });
-      const result = sort(graph);
+      const result = graph.sort();
       assert.deepEqual(result.nodes, [
         [A, D, G],
         [B, E],
@@ -116,7 +116,7 @@ describe('sort object', () => {
         { path: 'package.name' }
       );
 
-      const result = sort(graph);
+      const result = graph.sort();
       assert.deepEqual(result.nodes, [[{ package: D }], [{ package: E }], [{ package: F }]]);
       assert.deepEqual(result.cycles, [['A', 'B', 'A']]);
     });
