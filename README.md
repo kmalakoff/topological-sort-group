@@ -5,7 +5,7 @@ Topological sorting and cycle detection. Optional grouping for parallel processi
 # sort by group - default
 ```
 import assert from 'assert';
-import { Graph, sort, SortMode } from 'topological-sort-group';
+import { Graph, SortMode } from 'topological-sort-group';
 
 const graph = Graph.from(
   [
@@ -26,7 +26,7 @@ const graph = Graph.from(
   { path: 'package.name' }
 );
 
-const result = sort(graph);
+const result = graph.sort(); // SortMode.Group is default
 assert.deepEqual(result.nodes, [[{ package: { name: 'D' } }], [{ package: { name: 'E' } }], [{ package: { name: 'F' } }]]);
 assert.deepEqual(result.cycles, [['A', 'B', 'A']]);
 ```
@@ -34,7 +34,7 @@ assert.deepEqual(result.cycles, [['A', 'B', 'A']]);
 # sort flat
 ```
 import assert from 'assert';
-import { Graph, sort, SortMode } from 'topological-sort-group';
+import { Graph, SortMode } from 'topological-sort-group';
 
 const graph = Graph.from([
   ['A', 'C'],
@@ -46,7 +46,7 @@ const graph = Graph.from([
   ['E', 'G'],
   ['F', 'H'],
 ]);
-const result = sort(graph, SortMode.Flat);
+const result = graph.sort(SortMode.Flat);
 assert.deepEqual(result.nodes, ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']);
 assert.deepEqual(result.cycles, []);
 ```
