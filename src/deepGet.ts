@@ -3,10 +3,12 @@
 type GetReturnType<T> = T | undefined;
 type ValueType = Record<string | number, unknown>;
 
+const isArray = Array.isArray || ((x) => Object.prototype.toString.call(x) === '[object Array]');
+
 export default function deepGet<T>(value: unknown, query: string | string[] | number[], defaultVal: GetReturnType<T> = undefined): GetReturnType<T> {
-  const splitQuery = Array.isArray(query)
+  const splitQuery = isArray(query)
     ? query
-    : query
+    : (query as string)
         .replace(/(\[(\d)\])/g, '.$2')
         .replace(/^\./, '')
         .split('.');
