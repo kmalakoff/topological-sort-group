@@ -1,6 +1,5 @@
 import assert from 'assert';
 
-// @ts-ignore
 import Graph, { SortMode } from 'topological-sort-group';
 
 interface Named {

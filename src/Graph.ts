@@ -19,7 +19,9 @@ export default class Graph<T> {
 
   static from<T>(values: Array<Key | T | [Key | T, Key | T]>, options?: GraphOptions): Graph<T> {
     const graph = new Graph<T>(options);
-    values.forEach((value) => (isArray(value) ? graph.add(value[0], value[1]) : graph.add(value as T)));
+    values.forEach((value) => {
+      isArray(value) ? graph.add(value[0], value[1]) : graph.add(value as T);
+    });
     return graph;
   }
 
