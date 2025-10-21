@@ -1,7 +1,5 @@
 import assert from 'assert';
-// @ts-ignore
 import * as topo from 'topological-sort-group';
-// @ts-ignore
 import Graph, { SortMode } from 'topological-sort-group';
 
 describe('exports .ts', () => {
