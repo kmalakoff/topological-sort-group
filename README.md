@@ -29,6 +29,7 @@ const graph = Graph.from(
 const result = graph.sort(); // SortMode.Group is default
 assert.deepEqual(result.nodes, [[{ package: { name: 'D' } }], [{ package: { name: 'E' } }], [{ package: { name: 'F' } }]]);
 assert.deepEqual(result.cycles, [['A', 'B', 'A']]);
+assert.deepEqual(result.duplicates, []); // No duplicate keys
 ```
 
 # sort flat
@@ -49,6 +50,33 @@ const graph = Graph.from([
 const result = graph.sort(SortMode.Flat);
 assert.deepEqual(result.nodes, ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']);
 assert.deepEqual(result.cycles, []);
+assert.deepEqual(result.duplicates, []); // No duplicate keys
+```
+
+# handling duplicates
+```
+import assert from 'assert';
+import { Graph } from 'topological-sort-group';
+
+const graph = Graph.from(
+  [
+    { package: { name: 'A' } },
+    { package: { name: 'B' } },
+    { package: { name: 'A' } }, // Duplicate key with different value
+  ],
+  { path: 'package.name' }
+);
+
+const result = graph.sort();
+assert.deepEqual(result.nodes, [[{ package: { name: 'B' } }]]); // Only non-duplicate nodes
+assert.deepEqual(result.cycles, []);
+assert.deepEqual(result.duplicates, [{
+  key: 'A',
+  values: [
+    { package: { name: 'A' } },
+    { package: { name: 'A' } }
+  ]
+}]);
 ```
 
 ### Documentation
