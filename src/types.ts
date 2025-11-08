@@ -9,9 +9,16 @@ export type Node<T = Key> = {
 };
 
 export type Cycle = Key[];
+
+export interface DuplicateKey<T = Key> {
+  key: Key;
+  values: T[];
+}
+
 export interface SortResult<T = Key> {
   nodes: Node<T>[][];
   cycles: Cycle[];
+  duplicates: DuplicateKey<T>[];
 }
 
 export const SortMode = {
