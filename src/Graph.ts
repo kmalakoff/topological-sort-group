@@ -1,8 +1,6 @@
 import get from './deepGet.ts';
-import type { Cycle, DuplicateKey, GraphOptions, Key, Node, SortModeEnum, SortResult } from './types.ts';
+import type { Cycle, DependencyGraph, DuplicateKey, GraphOptions, Key, Node, SortModeEnum, SortResult } from './types.ts';
 import { SortMode } from './types.ts';
-
-const isArray = Array.isArray || ((x) => Object.prototype.toString.call(x) === '[object Array]');
 
 export default class Graph<T> {
   protected size: number;
@@ -19,15 +17,54 @@ export default class Graph<T> {
     this.duplicateMap = {};
   }
 
-  static from<T>(values: Array<Key | T | [Key | T, Key | T]>, options?: GraphOptions): Graph<T> {
+  // Create graph from DependencyGraph format
+  static from<T>(input: DependencyGraph<T>, options?: GraphOptions): Graph<T> {
     const graph = new Graph<T>(options);
-    values.forEach((value) => {
-      isArray(value) ? graph.add(value[0], value[1]) : graph.add(value as T);
-    });
+
+    // Add all nodes first
+    for (const id in input.nodes) {
+      graph.addNode(id, input.nodes[id]);
+    }
+
+    // Add dependencies (which become edges in the internal representation)
+    for (const dependent in input.dependencies) {
+      const deps = input.dependencies[dependent];
+      for (let i = 0; i < deps.length; i++) {
+        graph.addDependency(dependent, deps[i]);
+      }
+    }
+
     return graph;
   }
 
-  key(keyOrValue: Key | T): Key {
+  // Export to DependencyGraph format
+  toGraph(): DependencyGraph<T> {
+    const nodes: Record<string, T> = {};
+    const dependencies: Record<string, string[]> = {};
+
+    // Build nodes map
+    for (const key in this.nodeMap) {
+      nodes[key] = this.nodeMap[key].value;
+      dependencies[key] = [];
+    }
+
+    // Build dependencies by reversing edges
+    // edges[a] contains b means a -> b (b depends on a)
+    // So we need to add a to dependencies[b]
+    for (const from in this.nodeMap) {
+      const edges = this.nodeMap[from].edges;
+      for (let i = 0; i < edges.length; i++) {
+        const to = edges[i] as string;
+        if (dependencies[to]) {
+          dependencies[to].push(from);
+        }
+      }
+    }
+
+    return { nodes, dependencies };
+  }
+
+  private key(keyOrValue: Key | T): Key {
     if (this.path) return typeof keyOrValue === 'object' ? (get(keyOrValue, this.path) as Key) : (keyOrValue as Key);
     return keyOrValue as Key;
   }
@@ -52,45 +89,71 @@ export default class Graph<T> {
     return this.nodeMap[key].edges;
   }
 
-  add(keyOrValue: Key | T, toKeyOrValue?: Key | T) {
-    // Validate: throw on null or undefined
-    if (keyOrValue === null || keyOrValue === undefined) {
-      throw new Error('Cannot add null or undefined to graph');
-    }
+  // Add a node - key extracted from value using path option
+  addNode(value: T): void;
+  // Add a node with explicit id
+  addNode(id: string, value: T): void;
+  addNode(idOrValue: string | T, value?: T): void {
+    // Determine if called with (value) or (id, value)
+    let id: Key;
+    let nodeValue: T;
 
-    const key = this.key(keyOrValue);
-
-    // Validate: if path is set and key is undefined, the object is missing the required path
-    if (this.path && key === undefined) {
-      throw new Error(`Node is missing required path '${this.path}'`);
-    }
-
-    const value = this.path ? (typeof keyOrValue === 'object' ? keyOrValue : undefined) : (keyOrValue as T);
-    if (value !== undefined) {
-      if (this.nodeMap[key] === undefined) {
-        this.nodeMap[key] = { value: value as T, edges: [] } as Node<T>;
-        this.size++;
-      } else if (this.nodeMap[key].value !== value) {
-        // Track duplicate instead of throwing
-        if (this.duplicateMap[key] === undefined) {
-          this.duplicateMap[key] = [this.nodeMap[key].value];
-        }
-        this.duplicateMap[key].push(value as T);
-        return; // Don't add edges for duplicates
+    if (value === undefined) {
+      // Called as addNode(value) - extract key from path
+      nodeValue = idOrValue as T;
+      if (nodeValue === null || nodeValue === undefined) {
+        throw new Error('Cannot add null or undefined to graph');
+      }
+      id = this.key(nodeValue);
+      if (this.path && id === undefined) {
+        throw new Error(`Node is missing required path '${this.path}'`);
+      }
+    } else {
+      // Called as addNode(id, value)
+      id = idOrValue as string;
+      nodeValue = value;
+      if (id === null || id === undefined) {
+        throw new Error('Cannot add null or undefined id to graph');
+      }
+      if (nodeValue === null || nodeValue === undefined) {
+        throw new Error('Cannot add null or undefined value to graph');
       }
     }
-    // biome-ignore lint/complexity/noArguments: Apply arguments
-    if (arguments.length === 1) return;
 
-    // Validate toKeyOrValue as well
-    if (toKeyOrValue === null || toKeyOrValue === undefined) {
-      throw new Error('Cannot add null or undefined to graph');
+    if (this.nodeMap[id] === undefined) {
+      this.nodeMap[id] = { value: nodeValue, edges: [] } as Node<T>;
+      this.size++;
+    } else if (this.nodeMap[id].value !== nodeValue) {
+      // Track duplicate instead of throwing
+      if (this.duplicateMap[id] === undefined) {
+        this.duplicateMap[id] = [this.nodeMap[id].value];
+      }
+      this.duplicateMap[id].push(nodeValue);
+    }
+  }
+
+  // Add a dependency: dependent depends on dependency
+  // This creates an edge from dependency -> dependent (dependency must come before dependent)
+  addDependency(dependent: string, dependency: string): void {
+    if (dependent === null || dependent === undefined) {
+      throw new Error('Cannot add null or undefined dependent to graph');
+    }
+    if (dependency === null || dependency === undefined) {
+      throw new Error('Cannot add null or undefined dependency to graph');
     }
 
-    // add edge
-    this.add(toKeyOrValue);
-    const toKey = this.key(toKeyOrValue);
-    this.nodeMap[key].edges.push(toKey);
+    // Ensure both nodes exist (create with key as value if not using path)
+    if (this.nodeMap[dependency] === undefined) {
+      this.nodeMap[dependency] = { value: dependency as unknown as T, edges: [] } as Node<T>;
+      this.size++;
+    }
+    if (this.nodeMap[dependent] === undefined) {
+      this.nodeMap[dependent] = { value: dependent as unknown as T, edges: [] } as Node<T>;
+      this.size++;
+    }
+
+    // Add edge: dependency -> dependent (dependency unlocks dependent)
+    this.nodeMap[dependency].edges.push(dependent);
   }
 
   degrees(): Record<Key, number> {
