@@ -205,19 +205,19 @@ export default class Graph<T> {
     const degrees = this.degrees();
 
     // Initialize queue with no links
-    const queue = [];
+    const queue: { key: Key; level: number }[] = [];
     for (const key in degrees) {
       if (degrees[key] === 0) queue.push({ key, level: 0 });
     }
 
-    const nodes = [];
-    const groups = [];
+    const nodes: T[] = [];
+    const groups: T[][] = [];
 
     // process each level
     let processed = 0;
     let level = 0;
     while (queue.length > 0) {
-      const queued = queue.shift();
+      const queued = queue.shift()!;
 
       // If we're moving to a new level, store the previous level's nodes
       if (mode === SortMode.Group && queued.level > level) {

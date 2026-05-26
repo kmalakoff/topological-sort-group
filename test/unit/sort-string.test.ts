@@ -156,7 +156,7 @@ describe('sort strings', () => {
     it('round-trips through from/toGraph', () => {
       const input = {
         nodes: { A: 'A', B: 'B', C: 'C' },
-        dependencies: { A: [], B: ['A'], C: ['A', 'B'] },
+        dependencies: { A: [] as string[], B: ['A'], C: ['A', 'B'] },
       };
       const graph = Graph.from<string>(input);
       const output = graph.toGraph();
@@ -164,10 +164,10 @@ describe('sort strings', () => {
       assert.deepEqual(output.nodes, input.nodes);
       // Dependencies might be in different order, so sort them
       for (const key in output.dependencies) {
-        output.dependencies[key].sort();
+        (output.dependencies[key] as string[]).sort();
       }
       for (const key in input.dependencies) {
-        input.dependencies[key].sort();
+        (input.dependencies as Record<string, string[]>)[key].sort();
       }
       assert.deepEqual(output.dependencies, input.dependencies);
     });
