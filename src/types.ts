@@ -22,7 +22,7 @@ export interface DuplicateKey<T = Key> {
 }
 
 export interface SortResult<T = Key> {
-  nodes: Node<T>[][];
+  nodes: T[] | T[][];
   cycles: Cycle[];
   duplicates: DuplicateKey<T>[];
 }
