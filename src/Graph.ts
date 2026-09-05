@@ -217,7 +217,7 @@ export default class Graph<T> {
     let processed = 0;
     let level = 0;
     while (queue.length > 0) {
-      const queued = queue.shift()!;
+      const queued = queue.shift() as { key: Key; level: number };
 
       // If we're moving to a new level, store the previous level's nodes
       if (mode === SortMode.Group && queued.level > level) {
