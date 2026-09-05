@@ -1,1 +1,1 @@
-ignores: ["node-version-use", "ts-dev-stack", "topological-sort-group"]
+ignores: ["topological-sort-group", "node-version-use", "ts-dev-stack"]
